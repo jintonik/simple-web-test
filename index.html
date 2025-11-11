@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/styles.css">
+    <title>Simple Web Test</title>
+</head>
+<body>
+    <!-- Themes switcher -->
+    <div class="theme-toggle">
+        <span class="sun-icon">☀️</span>
+        <label class="toggle">
+            <input type="checkbox" id="theme-toggle">
+            <span class="slider"></span>
+        </label>
+        <span class="moon-icon">🌙</span>
+    </div>
+    <!-- Content -->
+    <div class="container">
+        <h1>Тесты по Kotlin</h1>
+        <form id="quiz-form">
+            <fieldset>
+                <legend>Вопрос 1</legend>
+                <p>Какая команда заставит компьютер напечатать текст на экране?</p>
+                <label class="quiz-option"><input type="radio" name="q1" value="a" required> printline("Привет!")</label>
+                <label class="quiz-option"><input type="radio" name="q1" value="b" required> println("Привет!")</label>
+                <label class="quiz-option"><input type="radio" name="q1" value="c" required> print("Привет!")</label>
+                <label class="quiz-option"><input type="radio" name="q1" value="d" required> say("Привет!")</label>
+            </fieldset>
+            <fieldset>
+                <legend>Вопрос 2</legend>
+                <p>Что выведет код: <code>println(2 + "2")</code>?</p>
+                <label class="quiz-option"><input type="radio" name="q1" value="4" required> 4</label>
+                <label class="quiz-option"><input type="radio" name="q1" value="22" required> "22"</label>
+                <label class="quiz-option"><input type="radio" name="q1" value="error" required> Ошибка</label>
+            </fieldset>
+            <fieldset>
+                <legend>Вопрос 3</legend>
+                <p>Как объявить переменную в Kotlin?</p>
+                <label class="quiz-option"><input type="radio" name="q2" value="var" required> var x = 5</label>
+                <label class="quiz-option"><input type="radio" name="q2" value="val" required> val x = 5</label>
+                <label class="quiz-option"><input type="radio" name="q2" value="both" required> Оба варианта</label>
+            </fieldset>
+            <button type="submit">Проверить результаты</button>
+        </form>
+    </div>
+
+
+    <script src="scripts/switch-theme.js"></script>
+    <script src="scripts/questions.js"></script>
+</body>
+</html>
