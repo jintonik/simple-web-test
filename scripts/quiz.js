@@ -1,66 +1,96 @@
 const container = document.getElementById("quiz-container");
 let QUESTIONS = [];
+let CURRENT_QUESTION_INDEX = 0;
+let USER_ANSWERS = {};
 
 async function loadQuestions() {
     const response = await fetch("/questions.json");
     if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
-    return await response.json();
+    QUESTIONS = await response.json();
+    renderCurrentQuestion();
 }
 
-function initQuiz() {
-    loadQuestions()
-        .then(questions => {
-            QUESTIONS = questions;
-            container.innerHTML = `
-                <form id="quiz-form">
-                    ${QUESTIONS.map(renderQuestion).join("")}
-                </form>
-            `;
-        });
+function nextQuestion() {
+    saveCurrentAnswer()
+    if (CURRENT_QUESTION_INDEX < QUESTIONS.length - 1) {
+        CURRENT_QUESTION_INDEX++;
+        renderCurrentQuestion();
+    }
 }
 
-function renderQuestion(question) {
-    const optionsHtml = question.options.map(opt => `
-        <label class="quiz-option">
-            <input
-               type="${question.type === 'multiple' ? 'checkbox' : 'radio'}"
-               name="q${question.id}"
-               value="${opt.id}"
-               ${question.type === "single" ? "required" : ""}
-            >
-            ${opt.text}
-        </label>
-    `).join("")
+function renderCurrentQuestion() {
+    const question = QUESTIONS[CURRENT_QUESTION_INDEX];
 
-    return `
-        <fieldset class="question" data-id="${question.id}">
-            <legend><strong>${question.id}. ${question.text}</strong></legend>
-            ${optionsHtml}
-        </fieldset>
-    `
+    container.innerHTML = `
+        <div class="question-card">
+            <h2>Вопрос ${CURRENT_QUESTION_INDEX + 1} из ${QUESTIONS.length}</h2>
+            <p><strong>${question.text}</strong></p>
+
+            ${question.options.map(opt => `
+                <label class="option">
+                    <input
+                        type="radio"
+                        name="current-answer"
+                        value="${opt.id}"
+                        ${USER_ANSWERS[question.id] === opt.id ? "checked" : ""}
+                    >
+                    ${opt.text}
+                </label>
+            `).join("")}
+
+            <div class="controls">
+                ${CURRENT_QUESTION_INDEX > 0
+                    ? `<button type="button" onClick="prevQuestion()">← Назад</button>`
+                    : `<button disabled></button>`}
+                ${CURRENT_QUESTION_INDEX < QUESTIONS.length - 1
+                    ? `<button type="button" onClick="nextQuestion()">Далее →</button>`
+                    : `<button type="button" onClick="finishQuiz()">Завершить тест</button>`}
+            </div>
+        </div>
+    `;
+    container.querySelector("input").focus();
 }
 
-document.addEventListener('DOMContentLoaded', initQuiz);
+function saveCurrentAnswer() {
+    const selected = document.querySelector("input[name='current-answer']:checked");
+    if (selected) {
+        const question = QUESTIONS[CURRENT_QUESTION_INDEX];
+        USER_ANSWERS[question.id] = selected.value;
+    }
+}
 
-const form = document.getElementById("quiz-form");
-form.addEventListener("submit", (e) => {
-    e.preventDefault();
+function prevQuestion() {
+    CURRENT_QUESTION_INDEX--;
+    renderCurrentQuestion()
+}
 
-    const formData = new FormData(form);
-    const answers = Object.fromEntries(formData.entries());
+function finishQuiz() {
+    saveCurrentAnswer();
 
     let score = 0;
-    QUESTIONS.forEach(q => {
-        const userAnswerId = answers[`q${q.id}`];
-        const correctOption = q.options.find(opt => opt.correct);
-        if (userAnswerId === correctOption?.id) {
+    QUESTIONS.forEach(question => {
+        const userAns = USER_ANSWERS[question.id];
+        const correct = question.options.find(opt => opt.correctOption);
+        if (userAns === correct?.id) {
             score++;
         }
     });
 
-    document.getElementById("result").innerHTML = `
-        <h2>Ваш результат ${score} из ${QUESTIONS.length}</>
+    document.getElementById("quiz-container").innerHTML = `
+        <div class="result">
+            <h1>Тест завершен!</h1>
+            <p>Ваш результат: <strong>${score} из ${QUESTIONS.length}</strong></p>
+            <button onClick="restartQuiz()">Пройти снова</button>
+        </div>
     `;
-});
+}
+
+function restartQuiz() {
+    CURRENT_QUESTION_INDEX = 0;
+    USER_ANSWERS = {};
+    renderCurrentQuestion();
+}
+
+document.addEventListener('DOMContentLoaded', loadQuestions);
