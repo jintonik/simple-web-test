@@ -5,7 +5,7 @@ export default defineConfig({
   appType: 'mpa', // Multi-Page Application — для статики
   build: {
     rollupOptions: {
-      input: './index.html' // ← ваш единственный вход
+      input: './index.html' // ← единственный вход
     }
   }
 });
