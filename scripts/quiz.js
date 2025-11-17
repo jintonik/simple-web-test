@@ -14,27 +14,6 @@ async function loadQuestions() {
 	}
 }
 
-function saveCurrentAnswer() {
-	const selected = document.querySelector("input[name='current-answer']:checked");
-	if (selected) {
-		const question = QUESTIONS[CURRENT_QUESTION_INDEX];
-		USER_ANSWERS[question.id] = selected.value;
-	}
-}
-
-function nextQuestion() {
-	saveCurrentAnswer();
-	if (CURRENT_QUESTION_INDEX < QUESTIONS.length - 1) {
-		CURRENT_QUESTION_INDEX++;
-		renderCurrentQuestion();
-	}
-}
-
-function prevQuestion() {
-	CURRENT_QUESTION_INDEX--;
-	renderCurrentQuestion();
-}
-
 function renderCurrentQuestion() {
 	const question = QUESTIONS[CURRENT_QUESTION_INDEX];
 
@@ -50,12 +29,7 @@ function renderCurrentQuestion() {
         </label>
       `).join("")}
       <div class="controls">
-        ${CURRENT_QUESTION_INDEX > 0
-			? `<button id="btn-prev" type="button" onclick="prevQuestion()">← Назад</button>`
-			: `<button disabled>Назад</button>`}
-        ${CURRENT_QUESTION_INDEX < QUESTIONS.length - 1
-			? `<button id="btn-next" type="button" onclick="nextQuestion()">Далее →</button>`
-			: `<button id="btn-finish" type="button" onclick="finishQuiz()">Завершить тест</button>`}
+				<button id="btn-next" type="button" >Далее →</button>
       </div>
     </div>
   `;
@@ -64,16 +38,46 @@ function renderCurrentQuestion() {
 		container.querySelector("input")?.focus();
 	}, 0);
 
-	  document.getElementById("btn-next")?.addEventListener("click", () => {
-        CURRENT_QUESTION_INDEX < QUESTIONS.length - 1
-          ? nextQuestion()
-          : finishQuiz();
-      });
+	document.getElementById("btn-next")?.addEventListener("click", () => {
+		CURRENT_QUESTION_INDEX < QUESTIONS.length - 1
+			? nextQuestion()
+			: finishQuiz();
+	});
+}
 
-      document.getElementById("btn-prev")?.addEventListener("click", prevQuestion);
+function saveCurrentAnswer() {
+	const selected = document.querySelector("input[name='current-answer']:checked");
+	if (selected) {
+		const question = QUESTIONS[CURRENT_QUESTION_INDEX];
+		USER_ANSWERS[question.id] = selected.value;
+	}
+}
+
+function nextQuestion() {
+	if (!isAnswerSelected()) {
+		triggerShake()
+		return;
+	}
+	saveCurrentAnswer();
+	if (CURRENT_QUESTION_INDEX < QUESTIONS.length - 1) {
+		CURRENT_QUESTION_INDEX++;
+		renderCurrentQuestion();
+	}
+}
+
+function triggerShake() {
+	const card = document.querySelector(".question-card");
+	card.classList.remove("shake");
+	void card.offsetWidth;
+	card.classList.add("shake");
 }
 
 function finishQuiz() {
+	if (!isAnswerSelected()) {
+		triggerShake()
+		return;
+	}
+
 	saveCurrentAnswer();
 
 	let score = 0;
@@ -87,15 +91,21 @@ function finishQuiz() {
     <div class="result">
       <h1>🎉 Тест завершён!</h1>
       <p>Ваш результат: <strong>${score} из ${QUESTIONS.length}</strong></p>
-      <button onclick="restartQuiz()">Пройти снова</button>
+      <button id="btn-restart" type="button">Пройти снова</button>
     </div>
   `;
+
+	document.getElementById("btn-restart")?.addEventListener("click", restartQuiz);
 }
 
 function restartQuiz() {
 	CURRENT_QUESTION_INDEX = 0;
 	USER_ANSWERS = {};
 	renderCurrentQuestion();
+}
+
+function isAnswerSelected() {
+	return document.querySelector("input[name='current-answer']:checked") != null;
 }
 
 document.addEventListener("DOMContentLoaded", loadQuestions);
