@@ -5,7 +5,8 @@ let USER_ANSWERS = {};
 
 async function loadQuestions() {
 	try {
-		const response = await fetch("/questions.json");
+		const url = `${import.meta.env.BASE_URL}questions.json`;
+		const response = await fetch(url);
 		if (!response.ok) throw new Error(`HTTP ${response.status}`);
 		QUESTIONS = await response.json();
 		renderCurrentQuestion();
