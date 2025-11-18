@@ -20,17 +20,14 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci                     # ← добавлено!
+        run: npm ci
 
       - name: Build
-        run: npm run build             # теперь vite доступен
+        run: npm run build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.DEPLOY_TOKEN }}
           publish_dir: ./dist
           publish_branch: github-build
-          allow_empty_commit: false
-          keep_files: false
-          force_orphan: true  # ← вот ключевой параметр!
