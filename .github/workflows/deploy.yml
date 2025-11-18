@@ -2,14 +2,13 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ github-build ]
+    branches: [ github-build ]  # ← ваша ветка!
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-
+      contents: write  # необходимо для публикации в gh-pages
     steps:
       - uses: actions/checkout@v4
 
@@ -19,15 +18,14 @@ jobs:
           node-version: 20
           cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
+      - run: npm ci
+      - run: npm run build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
-          personal_token: ${{ secrets.DEPLOY_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
-          publish_branch: github-build
+          publish_branch: github-build  # ← ветка, куда пушить сборку
+          # ⚠️ GitHub Pages по умолчанию смотрит в корень ВЕТКИ,
+          # поэтому содержимое dist/ будет доступно как /simple-web-test/
