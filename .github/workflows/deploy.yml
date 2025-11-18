@@ -24,6 +24,14 @@ jobs:
 
       - name: Build
         run: npm run build
+#        удалить этот блок
+      - name: Debug secrets
+        run: |
+          echo "DEPLOY_TOKEN length: ${#DEPLOY_TOKEN}"
+          echo "GITHUB_TOKEN length: ${#GITHUB_TOKEN}"
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
