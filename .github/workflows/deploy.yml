@@ -31,3 +31,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
           publish_branch: github-build
+          allow_empty_commit: false
+          keep_files: false
+          force_orphan: true  # ← вот ключевой параметр!
